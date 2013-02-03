@@ -1,0 +1,6 @@
+fritzbox-config-downloader
+==========================
+
+Downloads a configuration backup of an AVM Fritz!Box
+Supports 5 different download modes. Fritz!OS 5.50 introduced a new login mechanism,
+you have to select the right mode.
