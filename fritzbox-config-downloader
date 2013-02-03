@@ -5,6 +5,9 @@ Username=${3}
 Fernzugriff=${4:-0}
 SecondPassword=${5}
 
+ExportPassword="admin"
+ExportFilename"Fritzbox.export"
+
 CURL="curl -ksm 20"
 # Fuer den Fernzugriff HTTPs und HTTP Auth verwenden
 if [ "${Fernzugriff}" = "1" ]; then
@@ -73,18 +76,18 @@ fi
 
 
 # Download des Konfigurationsbackups
-$CURL -fF "sid=${SID}" -F "ImportExportPassword=admin" -F "ConfigExport=" "${Host}/cgi-bin/firmwarecfg" -o Fritzbox.export
+$CURL -fF "sid=${SID}" -F "ImportExportPassword=${ExportPassword}" -F "ConfigExport=" "${Host}/cgi-bin/firmwarecfg" -o "${ExportFilename}"
 if [ "$?" != "0" ]; then
 	echo "Download des Backups von Fritzbox ${Host} fehlgeschlagen"
-	rm Fritzbox.export
+	rm -f "${ExportFilename}"
 	exit 2
-elif ! head -n 1 Fritzbox.export | grep -q "^**** FRITZ!Box .* CONFIGURATION EXPORT$"; then
+elif ! head -n 1 "${ExportFilename}" | grep -q "^**** FRITZ!Box .* CONFIGURATION EXPORT$"; then
 	echo "Download ist kein Backup einer Fritzbox?!"
-	rm Fritzbox.export
+	rm "${ExportFilename}"
 	exit 2
-elif ! tail -n 1 Fritzbox.export | grep -q "^**** END OF EXPORT .* ****$"; then
+elif ! tail -n 1 "${ExportFilename}" | grep -q "^**** END OF EXPORT .* ****$"; then
 	echo "Download ist unvollständig"
-	rm Fritzbox.export
+	rm "${ExportFilename}"
 	exit 4
 fi
 
