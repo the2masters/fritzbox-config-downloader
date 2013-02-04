@@ -6,7 +6,7 @@ Fernzugriff=${4:-0}
 SecondPassword=${5}
 
 ExportPassword="admin"
-ExportFilename"Fritzbox.export"
+ExportFilename="Fritzbox.export"
 
 CURL="curl -ksm 20"
 # Fuer den Fernzugriff HTTPs und HTTP Auth verwenden
