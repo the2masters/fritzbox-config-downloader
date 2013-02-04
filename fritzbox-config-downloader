@@ -86,13 +86,13 @@ elif ! head -n 1 "${ExportFilename}" | grep -q "^**** FRITZ!Box .* CONFIGURATION
 	rm "${ExportFilename}"
 	exit 2
 elif ! tail -n 1 "${ExportFilename}" | grep -q "^**** END OF EXPORT .* ****$"; then
-	echo "Download ist unvollständig"
+	echo "Download ist unvollstaendig"
 	rm "${ExportFilename}"
 	exit 4
 fi
 
 
-#Logout wenn nötig
+#Logout wenn noetig
 case "${LoginType}" in
 	2) $CURL -d "security:command/logout=logout" -d "sid=${SID}"  -d "getpage=../html/login_sid.xml" "${Host}/cgi-bin/webcm" -o /dev/null ;;
 	1) $CURL -d "logout=logout" -d "sid=${SID}" "${Host}/login_sid.lua" -o /dev/null ;;

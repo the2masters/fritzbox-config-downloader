@@ -1,0 +1,22 @@
+#!/bin/sh
+Host=${1:-fritz.box}
+Passwort=${2:-freetz}
+Username=${3:-admin}
+
+ExportFilename="Fritzbox.freetz"
+
+curl -ksfm 20 -u "${Username}:${Passwort}" "${Host}:81/cgi-bin/backup/do_backup.cgi" -o "${ExportFilename}"
+if [ "$?" != "0" ]; then
+	echo "Verbindung zur Fritzbox ${Host} fehlgeschlagen"
+	exit 1
+fi
+
+#Aendere das folgende von -xzf zu -tzf um die Datei nur zu pruefen, nicht zu entpacken
+RET=$(tar --warning=no-timestamp -xzf "${ExportFilename}" 2>&1)
+if [ "$?" != "0" -o -n "${RET}" ]; then
+	echo "Fehler im Backup!?"
+	echo "${RET}"
+	rm "${ExportFilename}"
+	exit 2
+fi
+tar --warning=no-timestamp -xf var_flash/freetz
