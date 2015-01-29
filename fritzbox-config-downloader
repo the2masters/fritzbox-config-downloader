@@ -2,11 +2,12 @@
 Host=${1:-fritz.box}
 Password=${2}
 Username=${3}
-Fernzugriff=${4:-0}
-SecondPassword=${5}
+ExportPassword=${4:-admin}
+Fernzugriff=${5:-0}
+SecondPassword=${6}
 
-ExportPassword="admin"
-ExportFilename="Fritzbox.export"
+Now=$(date +"%Y%m%d%H%M%S")
+ExportFilename="FritzBox_${Now}.export"
 
 CURL="curl -ksm 20"
 # Fuer den Fernzugriff HTTPs und HTTP Auth verwenden
@@ -54,7 +55,7 @@ elif [ "${SID}" = "0000000000000000" ]; then
 		echo "${Login}"
 		exit 2
 	fi
-	Response=$(echo -n "${Challenge}-${Password}" | iconv -f utf-8 -t utf-16le | md5sum -b | sed "s| .*||g")
+	Response=$(printf "${Challenge}-${Password}" | iconv -f utf-8 -t utf-16le | md5 | sed "s| .*||g")
 
 
 	case "${LoginType}" in
@@ -81,11 +82,11 @@ if [ "$?" != "0" ]; then
 	echo "Download des Backups von Fritzbox ${Host} fehlgeschlagen"
 	rm -f "${ExportFilename}"
 	exit 2
-elif ! head -n 1 "${ExportFilename}" | grep -q "^**** FRITZ!Box .* CONFIGURATION EXPORT$"; then
+elif ! head -n 1 "${ExportFilename}" | grep -q "^\*\*\*\* FRITZ!Box .* CONFIGURATION EXPORT$"; then
 	echo "Download ist kein Backup einer Fritzbox?!"
 	rm "${ExportFilename}"
 	exit 2
-elif ! tail -n 1 "${ExportFilename}" | grep -q "^**** END OF EXPORT .* ****$"; then
+elif ! tail -n 1 "${ExportFilename}" | grep -q "^\*\*\*\* END OF EXPORT .* \*\*\*\*$"; then
 	echo "Download ist unvollstaendig"
 	rm "${ExportFilename}"
 	exit 4
