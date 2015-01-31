@@ -1,5 +1,18 @@
 #!/bin/sh
 
+# Prints usage
+print_usage() {
+	echo "Usage: ${0} [arguments]"
+	echo "Arguments:"
+	echo "-h, --host HOST\t\tThe host of the Fritz!Box.\t\tDefaults to fritz.box"
+	echo "-u, --username USERNAME\t\tThe username for the Fritz!Box.\t\tDefault is no username"
+	echo "-p, --password PASSWORD\t\tThe password for the Fritz!Box.\t\tDefault is no password"
+	echo "-e, --export-password=PASSWORD\t\tThe password for the backup file.\t\tDefault is admin. If the argument is not present, no password will be used"
+	echo "-o, --output-file OUTPUT_FILE\t\tThe downloaded backup will be written to this file.\t\tDefault is FritzBox.export"
+	echo "-r, --remote\t\tUse remote access to connect to the Fritz!Box"
+	echo "-s, --second-password\t\tSecond password for older Fritz!OS versions.\t\tDefault is no password"
+}
+
 # Set some defaults
 host="fritz.box"
 username=""
@@ -10,7 +23,7 @@ remoteAccess=0
 secondPassword=""
 
 # Parse the arguments
-ARGS=`getopt -o 'h:u:p:e::o:rs:' --long 'host:,username:,password:,export-password::,output-file:,remote,second-password:,help' -n 'fritzbox-config-downloader' -- "$@"`
+ARGS=`getopt -o 'h:u:p:e::o:rs:' --long 'host:,username:,password:,export-password::,output-file:,remote,second-password:,help' -n "${0}" -- "$@"`
 eval set -- "${ARGS}"
 
 # Extract the parsed arguments
@@ -47,6 +60,7 @@ while true ; do
 				"") shift 2 ;;
 				*) secondPassword=$2 ; shift 2 ;;
 			esac ;;
+		--help) print_usage ; shift ;;
 		--) shift ; break ;;
 		*) echo "Unkown argument ${1}!" ; exit 1 ;;
 	esac
