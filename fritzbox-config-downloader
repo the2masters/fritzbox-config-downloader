@@ -1,11 +1,17 @@
 #!/bin/sh
 
+# Check if we have advanced getopt
+advancedGetopt=0
+getopt -T > /dev/null 2>&1
+if [ $? -eq 4 ]; then
+	advancedGetopt=1
+fi
+
 # Prints usage
 print_usage() {
 	echo "Usage: ${0} [arguments]"
 	echo "Arguments:"
-	temp=$(getopt -T)
-	if [ $? -eq 4 ]; then
+	if [ $advancedGetopt -eq 1 ]; then
 		hostArg="-h, --host"
 		usernameArg="-u, --username"
 		passwordArg="-p, --password"
@@ -22,13 +28,13 @@ print_usage() {
 		remoteArg="-r"
 		secondPasswordArg="-s"
 	fi
-	echo "${hostArg} HOST\t\t\tThe host of the Fritz!Box.\t\t\t\tDefaults to fritz.box."
-	echo "${usernameArg} USERNAME\t\tThe username for the Fritz!Box.\t\t\t\tDefault is no username."
-	echo "${passwordArg} PASSWORD\t\tThe password for the Fritz!Box.\t\t\t\tDefault is no password."
-	echo "${exportPasswordArg}[=PASSWORD]\tThe password for the backup file.\t\t\tDefault is admin. If the argument is not present, no password will be used."
-	echo "${outputFileArg} OUTPUT_FILE\tThe downloaded backup will be written to this file.\tDefault is FritzBox.export."
-	echo "${remoteArg}\t\t\tUse remote access to connect to the Fritz!Box."
-	echo "${secondPasswordArg}\t\tSecond password for older Fritz!OS versions.\t\tDefault is no password."
+	echo "${hostArg} HOST\tThe host of the Fritz!Box. Defaults to fritz.box."
+	echo "${usernameArg} USERNAME\tThe username for the Fritz!Box. Default is no username."
+	echo "${passwordArg} PASSWORD\tThe password for the Fritz!Box. Default is no password."
+	echo "${exportPasswordArg}[=PASSWORD]\tThe password for the backup file. Default is admin. If the argument is not present, no password will be used."
+	echo "${outputFileArg} OUTPUT_FILE\tThe downloaded backup will be written to this file. Default is FritzBox.export."
+	echo "${remoteArg}\tUse remote access to connect to the Fritz!Box."
+	echo "${secondPasswordArg}\tSecond password for older Fritz!OS versions. Default is no password."
 }
 
 # Set some defaults
@@ -41,11 +47,10 @@ remoteAccess=0
 secondPassword=""
 
 # Parse the arguments
-temp=$(getopt -T)
-if [ $? -eq 4 ]; then
-	args=`getopt -o h:u:p:e::o:rs: --long "host:,username:,password:,export-password::,output-file:,remote,second-password:,help" -n 'fritzbox-config-downloader' -- $*`
+if [ $advancedGetopt -eq 1 ]; then
+	args=`getopt -o h:u:p:e::o:rs: --long "host:,username:,password:,export-password::,output-file:,remote,second-password:,help" -n 'fritzbox-config-downloader' -- "$@"`
 else
-	args=`getopt h:u:p:e::o:rs: -- $*`
+	args=`getopt h:u:p:e::o:rs: $*`
 fi
 if [ $? -ne 0 ]; then
 	echo "Invalid arguments!"
@@ -55,8 +60,8 @@ fi
 eval set -- "${args}"
 
 # Extract the parsed arguments
-for i ; do
-	case "${i}" in
+while true ; do
+	case "${1}" in
 		-h|--host)
 			case "${2}" in
 				"") shift 2 ;;
@@ -188,6 +193,7 @@ case "${loginType}" in
 	2) $curlCmd -d "security:command/logout=logout" -d "sid=${SID}"  -d "getpage=../html/login_sid.xml" "${host}/cgi-bin/webcm" -o /dev/null ;;
 esac
 
-filesize=$(stat -c%s "${exportFilename}")
+filesize=$(wc -c < "${exportFilename}")
+filesize=$(printf $filesize | tr -d ' ')
 echo "Downloaded backup file to ${exportFilename} (${filesize} bytes)!"
 exit 0
