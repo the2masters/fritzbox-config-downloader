@@ -147,7 +147,7 @@ elif [ "${SID}" = "0000000000000000" ]; then # 16 zeros
 		exit 2
 	fi
 
-	response=$(printf "${challenge}-${password}" | iconv -f utf-8 -t utf-16le | openssl dgst -md5 | sed "s| .*||g")
+	response=$(printf "${challenge}-${password}" | iconv -f utf-8 -t utf-16le | openssl dgst -md5 | sed 's/(stdin)=//g' | sed 's/ *//g'
 	case "${loginType}" in
 		1) login=$($curlCmd -d "login:command/response=${challenge}-${response}" -d "getpage=../html/login_sid.xml" "${host}/cgi-bin/webcm") ;;
 		2) login=$($curlCmd -d "response=${challenge}-${response}" -d "username=${username}" "${host}/login_sid.lua") ;;
