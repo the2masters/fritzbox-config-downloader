@@ -175,7 +175,7 @@ elif [ "${SID}" = "0000000000000000" ]; then # 16 zeros
 fi
 
 # Download the backup file (with or without an export password)
-if [[ "${exportPassword}" ]]; then
+if [ -n "${exportPassword}" ]; then
 	$curlCmd -fF "sid=${SID}" -F "ImportExportPassword=${exportPassword}" -F "ConfigExport=" "${host}/cgi-bin/firmwarecfg" -o "${exportFilename}"
 else
 	$curlCmd -fF "sid=${SID}" -F "ConfigExport=" "${host}/cgi-bin/firmwarecfg" -o "${exportFilename}"
