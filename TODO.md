@@ -1,4 +1,2 @@
-* Translate error messages to english (Or everything to german?)
-* What's the english term for "Fernzugriff"?
 * Document dependencies (more than curl, md5sum, iconv, grep, sed?)
 * Check if it works with other shells than bash
