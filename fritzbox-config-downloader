@@ -157,7 +157,7 @@ elif [ "${SID}" = "0000000000000000" ]; then # 16 zeros
 		echo "Missing dependency! Please make sure that one of the following commands is installed on your system: md5sum, md5 or openssl"
 		exit 1
 	fi
-	response=$(printf "${challenge}-${password}" | iconv -f utf-8 -t utf-16le | $md5command | sed 's|^\(.* \)?\([A-Fa-f0-9]+\)\( .*\)?|\1|g')
+	response=$(printf "${challenge}-${password}" | iconv -f utf-8 -t utf-16le | $md5command | sed 's|^\(.* \)\?\([A-Fa-f0-9]\+\)\( .*\)\?|\2|g')
 	case "${loginType}" in
 		1) login=$($curlCmd -d "login:command/response=${challenge}-${response}" -d "getpage=../html/login_sid.xml" "${host}/cgi-bin/webcm") ;;
 		2) login=$($curlCmd -d "response=${challenge}-${response}" -d "username=${username}" "${host}/login_sid.lua") ;;
